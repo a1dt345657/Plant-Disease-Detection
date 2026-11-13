@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!--
+	Interphase by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>MediCrop -- Upload Your Image</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="{{ url_for('static', filename='./css/skel.css') }}" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='./css/style.css') }}" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style-xlarge.css') }}" />
+		
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+	</head>
+	<body class="landing">
+
+		<!-- Header -->
+			<header id="header">
+				<h1><a href="https://trymedicrop.webflow.io/">MediCrop</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="https://trymedicrop.webflow.io/">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Banner -->
+			<section id="banner">
+				<h2>Upload Your Image Here</h2>
+				<p>Choose images to upload (PNG, JPG)</p>
+				<ul class="actions">
+					<form method="POST" action="/pred" enctype="multipart/form-data">
+					<div class="preview">
+						<label for="image_uploads" class="big button">Select File</label>
+						<input type="file" id="image_uploads" name="image_uploads" accept=".jpg, .jpeg, .png" multiple>
+					</div>
+					</form>
+					<input type="submit" value="Reset" onClick="window.location.reload();">
+				</ul>
+			</section>
+
+		<!-- One -->
+			<section id="one" class="wrapper style1 align-center">
+				<div class="container">
+					<header>
+						<h2>Diagnosis:</h2>
+					</header>
+					
+						<form>
+						<div>
+							{% for file in files %}
+							<img src="{{ url_for('upload', filename=file) }}"  height="250px" width="250px">
+							{% endfor %}
+							<h1>{{pred}}</h1> 
+						</div>
+						</form>
+					
+				</div>
+			</section>
+
+		<!-- Footer -->
+			<footer id="footer">
+				<div class="container">
+					<div class="row">
+						<section class="4u$ 12u$(medium) 12u$(small)">
+							<h3>Contact Us</h3>
+							<ul class="tabular">
+								<li>
+									<h3>Address</h3>
+									102 S Hall<br>
+									Berkeley, CA 94720
+								</li>
+								<li>
+									<h3>Mail</h3>
+									<a href="#">info@trymedicrop</a>
+								</li>
+								<li>
+									<h3>Phone</h3>
+									(555) 555-5555
+								</li>
+							</ul>
+						</section>
+					</div>
+					<ul class="copyright">
+						<li>&copy; MediCrop <br> All rights reserved.</li>
+						<li>Images: <a href="http://unsplash.com">Unsplash</a></li>
+					</ul>
+				</div>
+			</footer>
+	</body>
+	<script>
+		const input = document.querySelector('input');
+		const preview = document.querySelector('.preview');
+	
+		input.style.opacity = 0;
+	
+		input.addEventListener('change', updateImageDisplay);
+	
+		function updateImageDisplay() {
+		  while(preview.firstChild) {
+			preview.removeChild(preview.firstChild);
+		  }
+	
+		  const curFiles = input.files;
+		  if(curFiles.length === 0) {
+			const para = document.createElement('p');
+			para.textContent = 'No files currently selected for upload';
+			preview.appendChild(para);
+		  } else {
+			const list = document.createElement('ol');
+			preview.appendChild(list);
+	
+			for(const file of curFiles) {
+			  const listItem = document.createElement('li');
+			  const para = document.createElement('p');
+			  const see_below = document.createElement('p');
+	
+			  if(validFileType(file)) {
+				para.textContent = `${file.name} was successfully uploaded.` ;
+				const image = document.createElement('img');
+				image.src = URL.createObjectURL(file);
+				image.height = 400;
+				image.width = 400;
+	
+				listItem.appendChild(image);
+				listItem.appendChild(para);
+
+				see_below.textContent = `See below for your diagnosis!`;
+				listItem.appendChild(see_below);
+
+			  } else {
+				para.textContent = `File name ${file.name}: Not a valid file type. Update your selection.`;
+				listItem.appendChild(para);
+			  }
+	
+			  list.appendChild(listItem);
+			}
+		  }
+		}
+	
+	// https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types
+		const fileTypes = [
+			'image/apng',
+			'image/bmp',
+			'image/gif',
+			'image/jpeg',
+			'image/pjpeg',
+			'image/png',
+			'image/svg+xml',
+			'image/tiff',
+			'image/webp',
+			`image/x-icon`
+		];
+	
+		function validFileType(file) {
+		  return fileTypes.includes(file.type);
+		}
+	
+		function returnFileSize(number) {
+		  if(number < 1024) {
+			return number + 'bytes';
+		  } else if(number > 1024 && number < 1048576) {
+			return (number/1024).toFixed(1) + 'KB';
+		  } else if(number > 1048576) {
+			return (number/1048576).toFixed(1) + 'MB';
+		  }
+		}
+	  </script>
+</html>
